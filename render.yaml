@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: solia-backend
+    env: node
+    plan: free
+    branch: main
+    rootDir: backend
+    buildCommand: npm install && npm run build
+    startCommand: node dist/index.js
+    envVars:
+      - key: JWT_SECRET
+        value: your-secret-key # Replace with your real secret; Render encrypts this
+        sync: false
+      - key: DATABASE_URL
+        value: your-database-url # Replace with your real database URL
+        sync: false
