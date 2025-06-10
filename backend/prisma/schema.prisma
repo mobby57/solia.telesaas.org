@@ -1,0 +1,359 @@
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["mongodb"]
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Tenant {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  // Add other tenant-specific fields
+}
+
+model Organization {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  tenantId    String   @db.ObjectId
+  name        String
+  description String?
+  logo        String?
+  legalStatus String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  updatedBy   String?  @db.ObjectId
+
+  @@index([tenantId])
+}
+
+model User {
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  tenantId          String   @db.ObjectId
+  email             String   @unique
+  password          String
+  role              String
+  kycFields         Json?    // Dynamic KYC fields per role
+  termsAcceptedAt   DateTime?
+  privacyAcceptedAt DateTime?
+  lastLoginAt       DateTime?
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  updatedBy         String?  @db.ObjectId
+
+  @@index([tenantId])
+}
+
+model Mission {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  tenantId    String   @db.ObjectId
+  name        String
+  location    String?
+  objectives  String?
+  startDate   DateTime
+  endDate     DateTime
+  users       String[] // user IDs assigned
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  updatedBy   String?  @db.ObjectId
+
+  @@index([tenantId])
+}
+
+model Donation {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  tenantId    String   @db.ObjectId
+  amount      Float
+  method      String?
+  receipt     String?
+  date        DateTime
+  missionId   String   @db.ObjectId
+  donorId     String   @db.ObjectId
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  updatedBy   String?  @db.ObjectId
+
+  @@index([tenantId])
+  @@index([missionId])
+  @@index([donorId])
+}
+
+model Document {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  tenantId    String   @db.ObjectId
+  name        String
+  file        String
+  status      String   // à valider, validé, rejeté
+  userId      String?  @db.ObjectId
+  orgaId      String?  @db.ObjectId
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  updatedBy   String?  @db.ObjectId
+
+  @@index([tenantId])
+  @@index([userId])
+  @@index([orgaId])
+}
+
+model Task {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  tenantId    String   @db.ObjectId
+  type        String   // appel, terrain, rapport
+  date        DateTime
+  userId      String   @db.ObjectId  // operator assigned
+  missionId   String   @db.ObjectId
+  title       String
+  description String?
+  dueDate     DateTime?
+  status      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  updatedBy   String?  @db.ObjectId
+
+  @@index([tenantId])
+  @@index([userId])
+  @@index([missionId])
+}
+
+model Comment {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  tenantId    String   @db.ObjectId
+  authorId    String   @db.ObjectId
+  content     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  updatedBy   String?  @db.ObjectId
+
+  // Polymorphic relation fields
+  commentableId   String   @db.ObjectId
+  commentableType String
+
+  @@index([tenantId])
+  @@index([commentableId, commentableType])
+}
+
+model Tag {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  tenantId    String   @db.ObjectId
+  name        String
+  color       String?
+  type        String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  updatedBy   String?  @db.ObjectId
+
+  // Polymorphic relation fields
+  taggableId   String   @db.ObjectId
+  taggableType String
+
+  @@index([tenantId])
+  @@index([taggableId, taggableType])
+}
+
+model AuditLog {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  tenantId    String   @db.ObjectId
+  entity      String
+  action      String
+  authorId    String   @db.ObjectId
+  date        DateTime @default(now())
+
+  @@index([tenantId])
+}
+
+model ApiKey {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  tenantId  String   @db.ObjectId
+  name      String
+  scopes    String[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([tenantId])
+}
+
+model Formulaire {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  tenantId    String   @db.ObjectId
+  type        String
+  fields      Json
+  status      String
+  donationId  String?  @db.ObjectId
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([tenantId])
+  @@index([donationId])
+}
+
+model Prospect {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  tenantId    String   @db.ObjectId
+  name        String
+  status      String
+  assignedTo  String?  @db.ObjectId
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([tenantId])
+  @@index([assignedTo])
+}
+
+model Interaction {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  tenantId    String   @db.ObjectId
+  prospectId  String   @db.ObjectId
+  channel     String
+  content     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([tenantId])
+  @@index([prospectId])
+}
+
+model Notification {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  tenantId    String   @db.ObjectId
+  type        String
+  targetUserId String  @db.ObjectId
+  content     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([tenantId])
+  @@index([targetUserId])
+}
+
+model Feedback {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  tenantId    String   @db.ObjectId
+  userId      String   @db.ObjectId
+  sessionId   String   @db.ObjectId
+  comment     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([tenantId])
+  @@index([userId])
+  @@index([sessionId])
+}
+
+model Invoice {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  tenantId    String   @db.ObjectId
+  userId      String   @db.ObjectId
+  amount      Float
+  status      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([tenantId])
+  @@index([userId])
+}
+
+model StripeAccount {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  tenantId    String   @db.ObjectId
+  userId      String   @db.ObjectId
+  externalId  String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([tenantId])
+  @@index([userId])
+}
+
+model Comment {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  tenantId    String   @db.ObjectId
+  authorId    String   @db.ObjectId
+  content     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  updatedBy   String?  @db.ObjectId
+
+  // Polymorphic relation fields
+  commentableId   String   @db.ObjectId
+  commentableType String
+
+  @@index([tenantId])
+  @@index([commentableId, commentableType])
+}
+
+model Message {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  tenantId       String   @db.ObjectId
+  conversationId String   @db.ObjectId
+  senderId       String   @db.ObjectId
+  content        String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([tenantId])
+  @@index([conversationId])
+  @@index([senderId])
+}
+
+model Module {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  tenantId    String   @db.ObjectId
+  title       String
+  type        String
+  scoreMax    Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([tenantId])
+}
+
+model OAuthClient {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  clientId    String
+  redirectUri String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Script {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  tenantId    String   @db.ObjectId
+  title       String
+  type        String
+  content     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([tenantId])
+}
+
+model CallSession {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  tenantId    String   @db.ObjectId
+  operatorId  String   @db.ObjectId
+  transcriptId String  @db.ObjectId
+  duration    Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([tenantId])
+  @@index([operatorId])
+  @@index([transcriptId])
+}
+
+model Transcript {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  tenantId      String   @db.ObjectId
+  callSessionId String   @db.ObjectId
+  content       String
+  score         Float?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([tenantId])
+  @@index([callSessionId])
+}

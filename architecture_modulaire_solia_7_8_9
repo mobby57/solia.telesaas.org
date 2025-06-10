@@ -1,0 +1,71 @@
+// Architecture Modulaire de Solia
+digraph {
+	rankdir=LR size="10,8"
+	"UI Frontend" [label="UI Frontend
+React
+Tailwind
+Formulaires dynamiques
+Dashboard (Opérateur, Manager, Association)" fillcolor=lightblue shape=box style=filled]
+	"API Gateway" [label="API Gateway
+Fastify
+Swagger
+Multi-tenant
+Authentification JWT
+Gestion des rôles" fillcolor=lightblue shape=box style=filled]
+	"IA Layer" [label="IA Layer
+Script IA
+Coaching IA
+Optimisation missions
+Transcription
+Feedback live" fillcolor=lightblue shape=box style=filled]
+	"Téléphonie" [label="Téléphonie
+WebRTC/VOIP
+Appels sortants/entrants
+Enregistrement
+Scripts dynamiques" fillcolor=lightblue shape=box style=filled]
+	Formulaires [label="Formulaires
+Saisie sécurisée
+Validation temps réel
+Partiels/Complets
+Offline sync" fillcolor=lightblue shape=box style=filled]
+	CRM [label="CRM
+Historique donateur
+Suivi prospects
+Segmentation
+Campagnes automatisées" fillcolor=lightblue shape=box style=filled]
+	Facturation [label="Facturation
+70/30 Paiement
+Stripe
+Factures auto
+Suivi 77K€ auto-entrepreneur" fillcolor=lightblue shape=box style=filled]
+	Logistique [label="Logistique
+Suivi matériel
+Caution
+État mission
+Alertes" fillcolor=lightblue shape=box style=filled]
+	"API Publique" [label="API Publique
+Droits API
+OAuth 2.0
+Audit logs
+Connecteurs tiers" fillcolor=lightblue shape=box style=filled]
+	"Chat/Formation" [label="Chat/Formation
+Chat interne
+Modules de coaching
+Gamification
+Mentoring" fillcolor=lightblue shape=box style=filled]
+	"UI Frontend" -> "API Gateway"
+	"API Gateway" -> "IA Layer"
+	"API Gateway" -> "Téléphonie"
+	"API Gateway" -> Formulaires
+	"API Gateway" -> CRM
+	"API Gateway" -> Facturation
+	"API Gateway" -> Logistique
+	"API Gateway" -> "API Publique"
+	"API Gateway" -> "Chat/Formation"
+	"Téléphonie" -> Formulaires
+	"IA Layer" -> "Téléphonie"
+	"IA Layer" -> CRM
+	CRM -> Facturation
+	Logistique -> Facturation
+	"Chat/Formation" -> CRM
+}
