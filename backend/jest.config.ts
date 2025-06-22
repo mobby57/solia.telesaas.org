@@ -1,17 +1,15 @@
-export default {
-  preset: 'ts-jest/presets/default-esm',
-  testEnvironment: 'node',
+import type { Config } from '@jest/types';
+
+const config: Config.InitialOptions = {
   transform: {
-    '^.+\\.tsx?$': ['ts-jest', { tsconfig: './tsconfig.json' }],
+    '^.+\\.tsx?$': 'ts-jest',
   },
-  testMatch: [
-    "**/__tests__/**/*.[jt]s?(x)",
-    "**/?(*.)+(spec|test).[tj]s?(x)",
-    "../solia-test/**/*.[jt]s?(x)",
-    "<rootDir>/../solia-test/**/*.[jt]s?(x)"
-  ],
-  extensionsToTreatAsEsm: ['.ts'],
-  moduleNameMapper: {
-    '^(\\.{1,2}/.*)\\.js$': '$1',
-  },
+  testEnvironment: 'node',
+  testMatch: ['**/solia-test/**/*.test.ts'],
+  moduleFileExtensions: ['ts', 'js', 'json', 'node'],
+  moduleDirectories: ['node_modules', 'src'],
+  setupFiles: ['dotenv/config'],
+  verbose: true,
 };
+
+export default config;

@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  previewFeatures = ["mongodb"]
 }
 
 datasource db {
@@ -8,262 +7,194 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Tenant {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  // Add other tenant-specific fields
-}
-
-model Organization {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  tenantId    String   @db.ObjectId
-  name        String
-  description String?
-  logo        String?
-  legalStatus String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  updatedBy   String?  @db.ObjectId
-
-  @@index([tenantId])
-}
-
 model User {
-  id                String   @id @default(auto()) @map("_id") @db.ObjectId
-  tenantId          String   @db.ObjectId
-  email             String   @unique
-  password          String
-  role              String
-  kycFields         Json?    // Dynamic KYC fields per role
-  termsAcceptedAt   DateTime?
-  privacyAcceptedAt DateTime?
-  lastLoginAt       DateTime?
-  isActive          Boolean  @default(true)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-  updatedBy         String?  @db.ObjectId
-
-  @@index([tenantId])
+  id        String      @id @map("_id") @default(auto()) @db.ObjectId
+  email     String      @unique
+  password  String
+  tenantId  String
+  roles     UserRole[]  // ✅ Relation pivot
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
 }
 
-model Mission {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  tenantId    String   @db.ObjectId
-  name        String
-  location    String?
-  objectives  String?
-  startDate   DateTime
-  endDate     DateTime
-  users       String[] // user IDs assigned
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  updatedBy   String?  @db.ObjectId
-
-  @@index([tenantId])
+model Role {
+  id        String      @id @map("_id") @default(auto()) @db.ObjectId
+  name      String      @unique
+  tenantId  String
+  users     UserRole[]  // ✅ Relation pivot
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
 }
 
-model Donation {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  tenantId    String   @db.ObjectId
-  amount      Float
-  method      String?
-  receipt     String?
-  date        DateTime
-  missionId   String   @db.ObjectId
-  donorId     String   @db.ObjectId
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  updatedBy   String?  @db.ObjectId
+model UserRole {
+  id        String   @id @map("_id") @default(auto()) @db.ObjectId
+  userId    String   @db.ObjectId
+  roleId    String   @db.ObjectId
 
-  @@index([tenantId])
-  @@index([missionId])
-  @@index([donorId])
-}
+  user      User     @relation(fields: [userId], references: [id])
+  role      Role     @relation(fields: [roleId], references: [id])
 
-model Document {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  tenantId    String   @db.ObjectId
-  name        String
-  file        String
-  status      String   // à valider, validé, rejeté
-  userId      String?  @db.ObjectId
-  orgaId      String?  @db.ObjectId
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  updatedBy   String?  @db.ObjectId
-
-  @@index([tenantId])
-  @@index([userId])
-  @@index([orgaId])
-}
-
-model Task {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  tenantId    String   @db.ObjectId
-  type        String   // appel, terrain, rapport
-  date        DateTime
-  userId      String   @db.ObjectId  // operator assigned
-  missionId   String   @db.ObjectId
-  title       String
-  description String?
-  dueDate     DateTime?
-  status      String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  updatedBy   String?  @db.ObjectId
-
-  @@index([tenantId])
-  @@index([userId])
-  @@index([missionId])
-}
-
-model Comment {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  tenantId    String   @db.ObjectId
-  authorId    String   @db.ObjectId
-  content     String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  updatedBy   String?  @db.ObjectId
-
-  // Polymorphic relation fields
-  commentableId   String   @db.ObjectId
-  commentableType String
-
-  @@index([tenantId])
-  @@index([commentableId, commentableType])
-}
-
-model Tag {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  tenantId    String   @db.ObjectId
-  name        String
-  color       String?
-  type        String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  updatedBy   String?  @db.ObjectId
-
-  // Polymorphic relation fields
-  taggableId   String   @db.ObjectId
-  taggableType String
-
-  @@index([tenantId])
-  @@index([taggableId, taggableType])
-}
-
-model AuditLog {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  tenantId    String   @db.ObjectId
-  entity      String
-  action      String
-  authorId    String   @db.ObjectId
-  date        DateTime @default(now())
-
-  @@index([tenantId])
+  createdAt DateTime @default(now())
 }
 
 model ApiKey {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  tenantId  String   @db.ObjectId
-  name      String
-  scopes    String[]
+  id          String   @id @map("_id") @default(auto()) @db.ObjectId
+  key         String   @unique
+  description String?
+  tenantId    String
+  active      Boolean  @default(true)
+  permissions String[]
+  expiresAt   DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Script {
+  id        String   @id @map("_id") @default(auto()) @db.ObjectId
+  tenantId  String
+  title     String
+  content   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  @@index([tenantId])
 }
 
-model Formulaire {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  tenantId    String   @db.ObjectId
-  type        String
-  fields      Json
-  status      String
-  donationId  String?  @db.ObjectId
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  @@index([tenantId])
-  @@index([donationId])
+model CallSession {
+  id        String   @id @map("_id") @default(auto()) @db.ObjectId
+  userId    String
+  tenantId  String
+  startedAt DateTime @default(now())
+  endedAt   DateTime?
 }
 
-model Prospect {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  tenantId    String   @db.ObjectId
-  name        String
-  status      String
-  assignedTo  String?  @db.ObjectId
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  @@index([tenantId])
-  @@index([assignedTo])
-}
-
-model Interaction {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  tenantId    String   @db.ObjectId
-  prospectId  String   @db.ObjectId
-  channel     String
-  content     String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  @@index([tenantId])
-  @@index([prospectId])
-}
-
-model Notification {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  tenantId    String   @db.ObjectId
-  type        String
-  targetUserId String  @db.ObjectId
-  content     String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  @@index([tenantId])
-  @@index([targetUserId])
+model Donation {
+  id        String   @id @map("_id") @default(auto()) @db.ObjectId
+  amount    Float
+  donorId   String
+  tenantId  String
+  createdAt DateTime @default(now())
 }
 
 model Feedback {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  tenantId    String   @db.ObjectId
-  userId      String   @db.ObjectId
-  sessionId   String   @db.ObjectId
-  comment     String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @map("_id") @default(auto()) @db.ObjectId
+  message   String
+  userId    String
+  tenantId  String
+  createdAt DateTime @default(now())
+}
 
-  @@index([tenantId])
-  @@index([userId])
-  @@index([sessionId])
+model Formulaire {
+  id        String   @id @map("_id") @default(auto()) @db.ObjectId
+  data      Json
+  tenantId  String
+  createdAt DateTime @default(now())
+}
+
+model Interaction {
+  id        String   @id @map("_id") @default(auto()) @db.ObjectId
+  type      String
+  userId    String
+  tenantId  String
+  createdAt DateTime @default(now())
 }
 
 model Invoice {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  tenantId    String   @db.ObjectId
-  userId      String   @db.ObjectId
-  amount      Float
-  status      String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @map("_id") @default(auto()) @db.ObjectId
+  amount    Float
+  userId    String
+  tenantId  String
+  createdAt DateTime @default(now())
+}
 
-  @@index([tenantId])
-  @@index([userId])
+model Message {
+  id          String   @id @map("_id") @default(auto()) @db.ObjectId
+  content     String
+  senderId    String
+  receiverId  String
+  tenantId    String
+  createdAt   DateTime @default(now())
+}
+
+model Notification {
+  id        String   @id @map("_id") @default(auto()) @db.ObjectId
+  content   String
+  userId    String
+  tenantId  String
+  createdAt DateTime @default(now())
+}
+
+model Organization {
+  id        String   @id @map("_id") @default(auto()) @db.ObjectId
+  name      String
+  tenantId  String
+  createdAt DateTime @default(now())
+}
+
+model Prospect {
+  id        String   @id @map("_id") @default(auto()) @db.ObjectId
+  name      String
+  email     String
+  tenantId  String
+  createdAt DateTime @default(now())
+}
+
+model Rbac {
+  id         String   @id @map("_id") @default(auto()) @db.ObjectId
+  roleId     String
+  permission String
+  tenantId   String
+  createdAt  DateTime @default(now())
+}
+
+model RoleExtended {
+  id        String   @id @map("_id") @default(auto()) @db.ObjectId
+  roleId    String
+  extraData Json
+  tenantId  String
+  createdAt DateTime @default(now())
 }
 
 model StripeAccount {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  tenantId    String   @db.ObjectId
-  userId      String   @db.ObjectId
-  externalId  String
+  id         String   @id @map("_id") @default(auto()) @db.ObjectId
+  accountId  String
+  tenantId   String
+  createdAt  DateTime @default(now())
+}
+
+model Module {
+  id          String   @id @map("_id") @default(auto()) @db.ObjectId
+  tenantId    String
+  name        String
+  description String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
 
-  @@index([tenantId])
-  @@index([userId])
+model OauthClient {
+  id           String   @id @map("_id") @default(auto()) @db.ObjectId
+  tenantId     String
+  clientId     String
+  clientSecret String
+  redirectUris String[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Task {
+  id          String   @id @map("_id") @default(auto()) @db.ObjectId
+  tenantId    String
+  missionId   String?  // Added optional missionId field
+  title       String
+  description String?
+  status      String
+  assignedTo  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Transcript {
+  id          String   @id @map("_id") @default(auto()) @db.ObjectId
+  tenantId    String
+  content     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

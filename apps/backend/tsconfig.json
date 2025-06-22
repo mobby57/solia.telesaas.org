@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "CommonJS",
+    "rootDir": "src",
+    "outDir": "dist",
+    "strict": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "types": ["vitest", "jsonwebtoken"],
+    "baseUrl": "./",
+    "paths": {
+      "'*'": ["src/*"],
+      "modules/*": ["apps/backend/src/modules/*"]
+    }
+  },
+  "include": ["src", "apps/backend/src"],
+  "exclude": ["node_modules", "dist", "**/*.spec.ts", "solia-test"]
+}

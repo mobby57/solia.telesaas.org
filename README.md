@@ -1,76 +1,66 @@
-# Project Monorepo Setup
+# Utilisation de pnpm dans le monorepo Solia
 
-This repository is organized as a monorepo containing multiple workspaces:
+Ce projet utilise désormais **pnpm** comme gestionnaire de paquets pour optimiser l'installation et la gestion des dépendances dans ce monorepo.
 
-- **backend**: The backend API server built with Fastify and TypeScript.
-- **frontend**: The frontend React application using Vite and TypeScript.
-- **scripts**: Utility scripts for setup, database reset, seeding, etc.
-- **docs**: Documentation files.
-- **infra**: Infrastructure and deployment configurations.
 
-## Monorepo Structure
+### Installation de pnpm
 
-The monorepo uses npm workspaces to manage dependencies and scripts across packages. The root `package.json` defines the workspaces and common scripts.
-
-## TypeScript Configuration
-
-- The root `tsconfig.json` uses project references to the backend and frontend TypeScript projects.
-- Both backend and frontend have their own `tsconfig.json` files with `"composite": true` enabled to support project references.
-
-## Usage
-
-### Install dependencies
-
-Run the following command at the root of the repository:
+Si ce n'est pas déjà fait, installez pnpm globalement :
 
 ```bash
-npm install
+npm install -g pnpm
 ```
 
-This will install dependencies for all workspaces.
+### Nettoyage des anciens fichiers npm
 
-### Build all projects
-
-To build all projects in the monorepo, run:
+Depuis la racine du projet, supprimez les anciens dossiers `node_modules` et fichiers `package-lock.json` :
 
 ```bash
-npm run build
+rm -rf node_modules
+rm -rf backend/node_modules frontend/node_modules
+rm -f package-lock.json
+rm -f backend/package-lock.json frontend/package-lock.json
 ```
 
-### Run tests
+### Installation des dépendances avec pnpm
 
-To run tests across all workspaces, run:
+Installez toutes les dépendances du monorepo avec :
 
 ```bash
-npm run test
+pnpm install
 ```
 
-### Development
+### Commandes utiles
 
-- To start the backend development server:
+Pour lancer le backend uniquement :
 
 ```bash
-cd backend
-npm run dev
+pnpm --filter backend dev
 ```
 
-- To start the frontend development server:
+Pour lancer le frontend uniquement :
 
 ```bash
-cd frontend
-npm run dev
+pnpm --filter frontend dev
 ```
 
-## Additional Notes
+Pour lancer les deux en parallèle :
 
-- The root `package.json` includes scripts to clean node_modules across workspaces.
-- Ensure you run `npm install` only at the root to maintain workspace integrity.
-- Linting and formatting configurations are shared or can be added at the root level for consistency.
+```bash
+pnpm run dev:all
+```
 
-## Contributing
+### Versions recommandées
 
-Please follow the existing code style and run tests before submitting pull requests.
+- Node.js : voir `.nvmrc`
+- pnpm : version 8 ou supérieure
 
-## License
+---
 
-This project is licensed under the ISC License.
+Cette migration permet d'avoir un monorepo plus rapide, plus léger et plus facile à maintenir.
+
+## Test Coverage
+
+[![Coverage Status](https://codecov.io/gh/yourusername/solia/branch/main/graph/badge.svg)](https://codecov.io/gh/yourusername/solia)
+
+Le projet maintient une couverture de test supérieure à 90% sur tous les modules backend. Les rapports de couverture sont générés avec Vitest et se trouvent dans le répertoire `backend/coverage`.

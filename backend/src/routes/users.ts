@@ -1,4 +1,4 @@
-import { FastifyInstance } from 'fastify';
+import type { FastifyInstance } from 'fastify';
 import * as userController from '../controllers/users';
 
 async function userRoutes(server: FastifyInstance) {

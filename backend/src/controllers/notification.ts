@@ -1,44 +1,58 @@
-import { FastifyRequest, FastifyReply } from 'fastify';
-import { prisma } from '../prismaClient';
+import type { FastifyRequest, FastifyReply } from 'fastify';
+import { PrismaClient } from '@prisma/client';
 
-export async function getNotifications(request: FastifyRequest, reply: FastifyReply) {
-  const notifications = await prisma.notification.findMany();
+const prisma = new PrismaClient();
+
+export async function listNotifications(request: FastifyRequest, reply: FastifyReply) {
+  const notifications = await prisma.notification.findMany({
+    where: { tenantId: (request.user as any).tenantId },
+  });
   reply.send(notifications);
 }
 
 export async function getNotification(request: FastifyRequest, reply: FastifyReply) {
-  const { id } = request.params as { id: string };
-  const notification = await prisma.notification.findUnique({ where: { id } });
+  const id = (request.params as any).id;
+  const tenantId = (request.user as any).tenantId;
+  const notification = await prisma.notification.findFirst({ where: { id, tenantId } });
   if (!notification) {
-    reply.status(404).send({ message: 'Notification not found' });
-    return;
+    return reply.status(404).send({ error: 'Notification not found' });
   }
   reply.send(notification);
 }
 
 export async function createNotification(request: FastifyRequest, reply: FastifyReply) {
-  const data = request.body as { tenantId: string; type: string; targetUserId: string; content: string };
+  const data = request.body as any;
+  data.tenantId = (request.user as any).tenantId;
   const notification = await prisma.notification.create({ data });
   reply.status(201).send(notification);
 }
 
 export async function updateNotification(request: FastifyRequest, reply: FastifyReply) {
-  const { id } = request.params as { id: string };
-  const data = request.body as { type?: string; targetUserId?: string; content?: string };
+  const id = (request.params as any).id;
+  const data = request.body as any;
+  const tenantId = (request.user as any).tenantId;
   try {
-    const notification = await prisma.notification.update({ where: { id }, data });
-    reply.send(notification);
-  } catch {
-    reply.status(404).send({ message: 'Notification not found' });
+    const updated = await prisma.notification.updateMany({ where: { id, tenantId }, data });
+    if (updated.count === 0) {
+      return reply.status(404).send({ error: 'Notification not found or update failed' });
+    }
+    const updatedNotification = await prisma.notification.findFirst({ where: { id, tenantId } });
+    reply.send(updatedNotification);
+  } catch (error) {
+    reply.status(500).send({ error: 'Update failed' });
   }
 }
 
 export async function deleteNotification(request: FastifyRequest, reply: FastifyReply) {
-  const { id } = request.params as { id: string };
+  const id = (request.params as any).id;
+  const tenantId = (request.user as any).tenantId;
   try {
-    await prisma.notification.delete({ where: { id } });
+    const deleted = await prisma.notification.deleteMany({ where: { id, tenantId } });
+    if (deleted.count === 0) {
+      return reply.status(404).send({ error: 'Notification not found or delete failed' });
+    }
     reply.status(204).send();
-  } catch {
-    reply.status(404).send({ message: 'Notification not found' });
+  } catch (error) {
+    reply.status(500).send({ error: 'Delete failed' });
   }
 }

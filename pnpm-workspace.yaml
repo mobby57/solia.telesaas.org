@@ -1,3 +1,10 @@
 packages:
-  - 'backend'
-  - 'frontend'
+  - apps/backend
+  - apps/frontend
+  - packages/*
+
+onlyBuiltDependencies:
+  - '@prisma/client'
+  - bcrypt
+  - esbuild
+  - unrs-resolver

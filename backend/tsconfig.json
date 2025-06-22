@@ -1,20 +1,24 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "module": "ESNext",
-    "moduleResolution": "Node",
-    "esModuleInterop": true,
-    "isolatedModules": true,
-    "resolveJsonModule": true,
-    "allowSyntheticDefaultImports": true,
+    "jsx": "react-jsx",
     "forceConsistentCasingInFileNames": true,
-    "noEmit": true,
+    "target": "ES2021",
+    "module": "ESNext",
+    "lib": ["es2021"],
+    "outDir": "./dist",
+    "rootDir": "./src",
     "strict": true,
-    "types": ["node", "jest"],
-    "baseUrl": "./src",
-    "paths": {},
-    "composite": true
+    "esModuleInterop": true,
+    "moduleResolution": "Node",
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "types": ["node"]
   },
-  "include": ["src"]
-
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 }

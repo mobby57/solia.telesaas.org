@@ -1,0 +1,21 @@
+{
+  "cssImports": {
+    "/mnt/c/Users/moros/Desktop/solia/apps/frontend/src/app/layout.tsx": [
+      "/mnt/c/Users/moros/Desktop/solia/apps/frontend/src/app/globals.css"
+    ]
+  },
+  "cssModules": {
+    "/mnt/c/Users/moros/Desktop/solia/apps/frontend/src/app/page": [
+      "/mnt/c/Users/moros/Desktop/solia/apps/frontend/src/app/globals.css"
+    ],
+    "/mnt/c/Users/moros/Desktop/solia/apps/frontend/src/app/landing/page": [
+      "/mnt/c/Users/moros/Desktop/solia/apps/frontend/src/app/globals.css"
+    ],
+    "/mnt/c/Users/moros/Desktop/solia/apps/frontend/src/app/register/page": [
+      "/mnt/c/Users/moros/Desktop/solia/apps/frontend/src/app/globals.css"
+    ],
+    "/mnt/c/Users/moros/Desktop/solia/apps/frontend/src/app/login/page": [
+      "/mnt/c/Users/moros/Desktop/solia/apps/frontend/src/app/globals.css"
+    ]
+  }
+}

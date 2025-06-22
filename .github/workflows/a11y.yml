@@ -1,0 +1,50 @@
+name: Accessibility Tests
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+
+jobs:
+  accessibility:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Start frontend server
+        run: pnpm --filter frontend dev &
+        # Wait for server to be ready
+      - name: Wait for frontend server
+        run: |
+          for i in {1..30}; do
+            if curl -s http://localhost:3000 > /dev/null; then
+              echo "Server is up"
+              exit 0
+            else
+              echo "Waiting for server..."
+              sleep 2
+            fi
+          done
+          echo "Server did not start in time"
+          exit 1
+
+      - name: Run accessibility tests
+        run: pnpm --filter frontend exec playwright test tests/accessibility.test.ts
+
+      - name: Upload accessibility reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: a11y-reports
+          path: apps/frontend/tests/a11y-reports/

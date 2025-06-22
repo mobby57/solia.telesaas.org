@@ -1,4 +1,4 @@
-import { FastifyRequest, FastifyReply } from 'fastify';
+import type { FastifyRequest, FastifyReply } from 'fastify';
 import { prisma } from '../prismaClient';
 
 export async function getTranscripts(request: FastifyRequest, reply: FastifyReply) {

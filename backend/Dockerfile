@@ -1,12 +1,22 @@
-# Étape build
-FROM node:20-alpine AS builder
-WORKDIR /app
-COPY backend/package*.json ./
-RUN npm install
-COPY backend .
+# Use official Node.js LTS image
+FROM node:18-alpine
 
-# Étape run
-FROM node:20-alpine
-WORKDIR /app
-COPY --from=builder /app .
-CMD ["npm", "run", "dev"]
+# Create app directory
+WORKDIR /usr/src/app
+
+# Install app dependencies
+COPY apps/backend/package.json apps/backend/pnpm-lock.yaml ./
+RUN npm install -g pnpm
+RUN pnpm install
+
+# Copy backend source code
+COPY apps/backend .
+
+# Build the backend
+RUN pnpm run build
+
+# Expose port (adjust if needed)
+EXPOSE 3000
+
+# Start the backend server
+CMD ["node", "dist/main.js"]

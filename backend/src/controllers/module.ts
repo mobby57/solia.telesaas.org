@@ -1,44 +1,58 @@
-import { FastifyRequest, FastifyReply } from 'fastify';
-import { prisma } from '../prismaClient';
+import type { FastifyRequest, FastifyReply } from 'fastify';
+import { PrismaClient } from '@prisma/client';
 
-export async function getModules(request: FastifyRequest, reply: FastifyReply) {
-  const modules = await prisma.module.findMany();
+const prisma = new PrismaClient();
+
+export async function listModules(request: FastifyRequest, reply: FastifyReply) {
+  const modules = await prisma.module.findMany({
+    where: { tenantId: (request.user as any).tenantId },
+  });
   reply.send(modules);
 }
 
 export async function getModule(request: FastifyRequest, reply: FastifyReply) {
-  const { id } = request.params as { id: string };
-  const module = await prisma.module.findUnique({ where: { id } });
+  const id = (request.params as any).id;
+  const tenantId = (request.user as any).tenantId;
+  const module = await prisma.module.findFirst({ where: { id, tenantId } });
   if (!module) {
-    reply.status(404).send({ message: 'Module not found' });
-    return;
+    return reply.status(404).send({ error: 'Module not found' });
   }
   reply.send(module);
 }
 
 export async function createModule(request: FastifyRequest, reply: FastifyReply) {
-  const data = request.body as { tenantId: string; title: string; type: string; scoreMax: number };
+  const data = request.body as any;
+  data.tenantId = (request.user as any).tenantId;
   const module = await prisma.module.create({ data });
   reply.status(201).send(module);
 }
 
 export async function updateModule(request: FastifyRequest, reply: FastifyReply) {
-  const { id } = request.params as { id: string };
-  const data = request.body as { title?: string; type?: string; scoreMax?: number };
+  const id = (request.params as any).id;
+  const data = request.body as any;
+  const tenantId = (request.user as any).tenantId;
   try {
-    const module = await prisma.module.update({ where: { id }, data });
-    reply.send(module);
-  } catch {
-    reply.status(404).send({ message: 'Module not found' });
+    const updated = await prisma.module.updateMany({ where: { id, tenantId }, data });
+    if (updated.count === 0) {
+      return reply.status(404).send({ error: 'Module not found or update failed' });
+    }
+    const updatedModule = await prisma.module.findFirst({ where: { id, tenantId } });
+    reply.send(updatedModule);
+  } catch (error) {
+    reply.status(500).send({ error: 'Update failed' });
   }
 }
 
 export async function deleteModule(request: FastifyRequest, reply: FastifyReply) {
-  const { id } = request.params as { id: string };
+  const id = (request.params as any).id;
+  const tenantId = (request.user as any).tenantId;
   try {
-    await prisma.module.delete({ where: { id } });
+    const deleted = await prisma.module.deleteMany({ where: { id, tenantId } });
+    if (deleted.count === 0) {
+      return reply.status(404).send({ error: 'Module not found or delete failed' });
+    }
     reply.status(204).send();
-  } catch {
-    reply.status(404).send({ message: 'Module not found' });
+  } catch (error) {
+    reply.status(500).send({ error: 'Delete failed' });
   }
 }

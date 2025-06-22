@@ -1,44 +1,58 @@
-import { FastifyRequest, FastifyReply } from 'fastify';
-import { prisma } from '../prismaClient';
+import type { FastifyRequest, FastifyReply } from 'fastify';
+import { PrismaClient } from '@prisma/client';
 
-export async function getOAuthClients(request: FastifyRequest, reply: FastifyReply) {
-  const clients = await prisma.oAuthClient.findMany();
+const prisma = new PrismaClient();
+
+export async function listOAuthClients(request: FastifyRequest, reply: FastifyReply) {
+  const clients = await prisma.oauthClient.findMany({
+    where: { tenantId: (request.user as any).tenantId },
+  });
   reply.send(clients);
 }
 
 export async function getOAuthClient(request: FastifyRequest, reply: FastifyReply) {
-  const { id } = request.params as { id: string };
-  const client = await prisma.oAuthClient.findUnique({ where: { id } });
+  const id = (request.params as any).id;
+  const tenantId = (request.user as any).tenantId;
+  const client = await prisma.oauthClient.findFirst({ where: { id, tenantId } });
   if (!client) {
-    reply.status(404).send({ message: 'OAuthClient not found' });
-    return;
+    return reply.status(404).send({ error: 'OAuthClient not found' });
   }
   reply.send(client);
 }
 
 export async function createOAuthClient(request: FastifyRequest, reply: FastifyReply) {
-  const data = request.body as { clientId: string; redirectUri: string };
-  const client = await prisma.oAuthClient.create({ data });
+  const data = request.body as any;
+  data.tenantId = (request.user as any).tenantId;
+  const client = await prisma.oauthClient.create({ data });
   reply.status(201).send(client);
 }
 
 export async function updateOAuthClient(request: FastifyRequest, reply: FastifyReply) {
-  const { id } = request.params as { id: string };
-  const data = request.body as { clientId?: string; redirectUri?: string };
+  const id = (request.params as any).id;
+  const data = request.body as any;
+  const tenantId = (request.user as any).tenantId;
   try {
-    const client = await prisma.oAuthClient.update({ where: { id }, data });
-    reply.send(client);
-  } catch {
-    reply.status(404).send({ message: 'OAuthClient not found' });
+    const updated = await prisma.oauthClient.updateMany({ where: { id, tenantId }, data });
+    if (updated.count === 0) {
+      return reply.status(404).send({ error: 'OAuthClient not found or update failed' });
+    }
+    const updatedClient = await prisma.oauthClient.findFirst({ where: { id, tenantId } });
+    reply.send(updatedClient);
+  } catch (error) {
+    reply.status(500).send({ error: 'Update failed' });
   }
 }
 
 export async function deleteOAuthClient(request: FastifyRequest, reply: FastifyReply) {
-  const { id } = request.params as { id: string };
+  const id = (request.params as any).id;
+  const tenantId = (request.user as any).tenantId;
   try {
-    await prisma.oAuthClient.delete({ where: { id } });
+    const deleted = await prisma.oauthClient.deleteMany({ where: { id, tenantId } });
+    if (deleted.count === 0) {
+      return reply.status(404).send({ error: 'OAuthClient not found or delete failed' });
+    }
     reply.status(204).send();
-  } catch {
-    reply.status(404).send({ message: 'OAuthClient not found' });
+  } catch (error) {
+    reply.status(500).send({ error: 'Delete failed' });
   }
 }

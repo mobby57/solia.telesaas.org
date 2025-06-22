@@ -1,44 +1,58 @@
-import { FastifyRequest, FastifyReply } from 'fastify';
-import { prisma } from '../prismaClient';
+import type { FastifyRequest, FastifyReply } from 'fastify';
+import { PrismaClient } from '@prisma/client';
 
-export async function getInvoices(request: FastifyRequest, reply: FastifyReply) {
-  const invoices = await prisma.invoice.findMany();
+const prisma = new PrismaClient();
+
+export async function listInvoices(request: FastifyRequest, reply: FastifyReply) {
+  const invoices = await prisma.invoice.findMany({
+    where: { tenantId: (request.user as any).tenantId },
+  });
   reply.send(invoices);
 }
 
 export async function getInvoice(request: FastifyRequest, reply: FastifyReply) {
-  const { id } = request.params as { id: string };
-  const invoice = await prisma.invoice.findUnique({ where: { id } });
+  const id = (request.params as any).id;
+  const tenantId = (request.user as any).tenantId;
+  const invoice = await prisma.invoice.findFirst({ where: { id, tenantId } });
   if (!invoice) {
-    reply.status(404).send({ message: 'Invoice not found' });
-    return;
+    return reply.status(404).send({ error: 'Invoice not found' });
   }
   reply.send(invoice);
 }
 
 export async function createInvoice(request: FastifyRequest, reply: FastifyReply) {
-  const data = request.body as { tenantId: string; userId: string; amount: number; status: string };
+  const data = request.body as any;
+  data.tenantId = (request.user as any).tenantId;
   const invoice = await prisma.invoice.create({ data });
   reply.status(201).send(invoice);
 }
 
 export async function updateInvoice(request: FastifyRequest, reply: FastifyReply) {
-  const { id } = request.params as { id: string };
-  const data = request.body as { amount?: number; status?: string };
+  const id = (request.params as any).id;
+  const data = request.body as any;
+  const tenantId = (request.user as any).tenantId;
   try {
-    const invoice = await prisma.invoice.update({ where: { id }, data });
-    reply.send(invoice);
-  } catch {
-    reply.status(404).send({ message: 'Invoice not found' });
+    const updated = await prisma.invoice.updateMany({ where: { id, tenantId }, data });
+    if (updated.count === 0) {
+      return reply.status(404).send({ error: 'Invoice not found or update failed' });
+    }
+    const updatedInvoice = await prisma.invoice.findFirst({ where: { id, tenantId } });
+    reply.send(updatedInvoice);
+  } catch (error) {
+    reply.status(500).send({ error: 'Update failed' });
   }
 }
 
 export async function deleteInvoice(request: FastifyRequest, reply: FastifyReply) {
-  const { id } = request.params as { id: string };
+  const id = (request.params as any).id;
+  const tenantId = (request.user as any).tenantId;
   try {
-    await prisma.invoice.delete({ where: { id } });
+    const deleted = await prisma.invoice.deleteMany({ where: { id, tenantId } });
+    if (deleted.count === 0) {
+      return reply.status(404).send({ error: 'Invoice not found or delete failed' });
+    }
     reply.status(204).send();
-  } catch {
-    reply.status(404).send({ message: 'Invoice not found' });
+  } catch (error) {
+    reply.status(500).send({ error: 'Delete failed' });
   }
 }

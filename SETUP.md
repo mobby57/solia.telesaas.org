@@ -2,16 +2,16 @@
 
 This guide explains how to set up the project environment using NVM, install dependencies, configure Prisma with MongoDB, and run the project.
 
-## 1. Use NVM to install Node.js v18
+## 1. Use NVM to install Node.js v20
 
-The project requires Node.js version 18 as specified in the `.nvmrc` file.
+The project requires Node.js version 20 as specified in the `.nvmrc` file.
 
 ```bash
-# Install Node.js v18 using NVM
-nvm install 18
+# Install Node.js v20 using NVM
+nvm install 20
 
-# Use Node.js v18
-nvm use 18
+# Use Node.js v20
+nvm use 20
 
 # Verify Node.js version
 node -v
@@ -105,5 +105,33 @@ npm run dev
 - Use the provided scripts as templates and customize them as needed.
 
 ---
-
 This completes the environment setup and project initialization using NVM and Prisma with MongoDB.
+
+## 7. Docker Build and Run for Backend (Monorepo)
+
+Since this is a monorepo, when building the backend Docker image, ensure the build context is set to the `backend` directory.
+
+Use the following command to build the backend Docker image:
+
+```bash
+docker build -t backend-image -f backend/Dockerfile backend
+```
+
+This ensures the Dockerfile's relative COPY commands work correctly.
+
+The `docker-compose.yml` is configured to build the backend service with the correct context:
+
+```yaml
+services:
+  backend:
+    build: ./backend
+    ...
+```
+
+Use `docker-compose` commands to build and run the services for consistent context handling.
+
+## Notes
+
+- Always run Docker build commands for backend with `backend` as the build context.
+- Use relative COPY commands in `backend/Dockerfile`.
+- Use `docker-compose` for easier multi-service management.

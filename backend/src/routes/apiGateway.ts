@@ -1,28 +1,28 @@
-import { FastifyInstance } from 'fastify';
-import * as userRoutes from '@/controllers/auth';
-import * as taskRoutes from '@/controllers/tasks';
+import type { FastifyInstance, FastifyPluginAsync } from 'fastify';
+import userRoutes from './user.js';
 // Placeholder imports for other modules
-// import iaLayerRoutes from '@/controllers/iaLayer';
-// import telephonieRoutes from '@/controllers/telephonie';
-// import formulairesRoutes from '@/controllers/formulaires';
-// import crmRoutes from '@/controllers/crm';
-// import facturationRoutes from '@/controllers/facturation';
-// import logistiqueRoutes from '@/controllers/logistique';
-// import apiPubliqueRoutes from '@/controllers/apiPublique';
-// import chatFormationRoutes from '@/controllers/chatFormation';
+// import taskRoutes from './tasks';
+// import iaLayerRoutes from './iaLayer';
+// import telephonieRoutes from './telephonie';
+// import formulairesRoutes from './formulaires';
+// import crmRoutes from './crm';
+// import facturationRoutes from './facturation';
+// import logistiqueRoutes from './logistique';
+// import apiPubliqueRoutes from './apiPublique';
+// import chatFormationRoutes from './chatFormation';
 
-async function apiGatewayRoutes(fastify: FastifyInstance) {
-  fastify.register(userRoutes, { prefix: '/users' });
-  fastify.register(taskRoutes, { prefix: '/tasks' });
+const apiGatewayRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
+  await fastify.register(userRoutes, { prefix: '/users' });
   // Register other module routes here
-  // fastify.register(iaLayerRoutes, { prefix: '/ia' });
-  // fastify.register(telephonieRoutes, { prefix: '/telephonie' });
-  // fastify.register(formulairesRoutes, { prefix: '/formulaires' });
-  // fastify.register(crmRoutes, { prefix: '/crm' });
-  // fastify.register(facturationRoutes, { prefix: '/facturation' });
-  // fastify.register(logistiqueRoutes, { prefix: '/logistique' });
-  // fastify.register(apiPubliqueRoutes, { prefix: '/apiPublique' });
-  // fastify.register(chatFormationRoutes, { prefix: '/chatFormation' });
-}
+  // await fastify.register(taskRoutes, { prefix: '/tasks' });
+  // await fastify.register(iaLayerRoutes, { prefix: '/ia' });
+  // await fastify.register(telephonieRoutes, { prefix: '/telephonie' });
+  // await fastify.register(formulairesRoutes, { prefix: '/formulaires' });
+  // await fastify.register(crmRoutes, { prefix: '/crm' });
+  // await fastify.register(facturationRoutes, { prefix: '/facturation' });
+  // await fastify.register(logistiqueRoutes, { prefix: '/logistique' });
+  // await fastify.register(apiPubliqueRoutes, { prefix: '/apiPublique' });
+  // await fastify.register(chatFormationRoutes, { prefix: '/chatFormation' });
+};
 
 export default apiGatewayRoutes;

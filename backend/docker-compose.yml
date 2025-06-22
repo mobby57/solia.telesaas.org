@@ -1,0 +1,30 @@
+services:
+  backend:
+    build: .
+    container_name: solia-backend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=test
+      - PORT=3001
+      - DATABASE_URL=mongodb://root:example@mongodb:27017/solia?authSource=admin
+      - JWT_SECRET=supersecretkey
+    depends_on:
+      - mongodb
+    volumes:
+      - .:/usr/src/app
+    command: ["node", "dist/server.js"]
+
+  mongodb:
+    image: mongo:6.0
+    container_name: solia-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+
+volumes:
+  mongodb_data:

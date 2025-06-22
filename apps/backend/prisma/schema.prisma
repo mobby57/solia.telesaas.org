@@ -1,0 +1,200 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "mongodb"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    id        String     @id @default(auto()) @map("_id") @db.ObjectId
+    email     String     @unique
+    password  String
+    tenantId  String
+    roles     UserRole[] // ✅ Relation pivot
+    createdAt DateTime   @default(now())
+    updatedAt DateTime   @updatedAt
+}
+
+model Role {
+    id        String     @id @default(auto()) @map("_id") @db.ObjectId
+    name      String     @unique
+    tenantId  String
+    users     UserRole[] // ✅ Relation pivot
+    createdAt DateTime   @default(now())
+    updatedAt DateTime   @updatedAt
+}
+
+model UserRole {
+    id     String @id @default(auto()) @map("_id") @db.ObjectId
+    userId String @db.ObjectId
+    roleId String @db.ObjectId
+
+    user User @relation(fields: [userId], references: [id])
+    role Role @relation(fields: [roleId], references: [id])
+
+    createdAt DateTime @default(now())
+}
+
+model ApiKey {
+    id          String    @id @default(auto()) @map("_id") @db.ObjectId
+    key         String    @unique
+    description String?
+    tenantId    String
+    active      Boolean   @default(true)
+    permissions String[]
+    expiresAt   DateTime?
+    createdAt   DateTime  @default(now())
+    updatedAt   DateTime  @updatedAt
+}
+
+model Script {
+    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    tenantId  String
+    title     String
+    content   String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model CallSession {
+    id        String    @id @default(auto()) @map("_id") @db.ObjectId
+    userId    String
+    tenantId  String
+    startedAt DateTime  @default(now())
+    endedAt   DateTime?
+}
+
+model Donation {
+    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    amount    Float
+    donorId   String
+    tenantId  String
+    createdAt DateTime @default(now())
+}
+
+model Feedback {
+    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    message   String
+    userId    String
+    tenantId  String
+    createdAt DateTime @default(now())
+}
+
+model Formulaire {
+    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    data      Json
+    tenantId  String
+    createdAt DateTime @default(now())
+}
+
+model Interaction {
+    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    type      String
+    userId    String
+    tenantId  String
+    createdAt DateTime @default(now())
+}
+
+model Invoice {
+    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    amount    Float
+    userId    String
+    tenantId  String
+    createdAt DateTime @default(now())
+}
+
+model Message {
+    id         String   @id @default(auto()) @map("_id") @db.ObjectId
+    content    String
+    senderId   String
+    receiverId String
+    tenantId   String
+    createdAt  DateTime @default(now())
+}
+
+model Notification {
+    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    content   String
+    userId    String
+    tenantId  String
+    createdAt DateTime @default(now())
+}
+
+model Organization {
+    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    name      String
+    tenantId  String
+    createdAt DateTime @default(now())
+}
+
+model Prospect {
+    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    name      String
+    email     String
+    tenantId  String
+    createdAt DateTime @default(now())
+}
+
+model Rbac {
+    id         String   @id @default(auto()) @map("_id") @db.ObjectId
+    roleId     String
+    permission String
+    tenantId   String
+    createdAt  DateTime @default(now())
+}
+
+model RoleExtended {
+    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    roleId    String
+    extraData Json
+    tenantId  String
+    createdAt DateTime @default(now())
+}
+
+model StripeAccount {
+    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    accountId String
+    tenantId  String
+    createdAt DateTime @default(now())
+}
+
+model Module {
+    id          String   @id @default(auto()) @map("_id") @db.ObjectId
+    tenantId    String
+    name        String
+    description String?
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+}
+
+model OauthClient {
+    id           String   @id @default(auto()) @map("_id") @db.ObjectId
+    tenantId     String
+    clientId     String
+    clientSecret String
+    redirectUris String[]
+    createdAt    DateTime @default(now())
+    updatedAt    DateTime @updatedAt
+}
+
+model Task {
+    id          String   @id @default(auto()) @map("_id") @db.ObjectId
+    tenantId    String
+    missionId   String? // Added optional missionId field
+    title       String
+    description String?
+    status      String
+    assignedTo  String?
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+}
+
+model Transcript {
+    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    tenantId  String
+    content   String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}

@@ -1,44 +1,58 @@
-import { FastifyRequest, FastifyReply } from 'fastify';
-import { prisma } from '../prismaClient';
+import type { FastifyRequest, FastifyReply } from 'fastify';
+import { PrismaClient } from '@prisma/client';
 
-export async function getFeedbacks(request: FastifyRequest, reply: FastifyReply) {
-  const feedbacks = await prisma.feedback.findMany();
+const prisma = new PrismaClient();
+
+export async function listFeedbacks(request: FastifyRequest, reply: FastifyReply) {
+  const feedbacks = await prisma.feedback.findMany({
+    where: { tenantId: (request.user as any).tenantId },
+  });
   reply.send(feedbacks);
 }
 
 export async function getFeedback(request: FastifyRequest, reply: FastifyReply) {
-  const { id } = request.params as { id: string };
-  const feedback = await prisma.feedback.findUnique({ where: { id } });
+  const id = (request.params as any).id;
+  const tenantId = (request.user as any).tenantId;
+  const feedback = await prisma.feedback.findFirst({ where: { id, tenantId } });
   if (!feedback) {
-    reply.status(404).send({ message: 'Feedback not found' });
-    return;
+    return reply.status(404).send({ error: 'Feedback not found' });
   }
   reply.send(feedback);
 }
 
 export async function createFeedback(request: FastifyRequest, reply: FastifyReply) {
-  const data = request.body as { tenantId: string; userId: string; sessionId: string; comment: string };
+  const data = request.body as any;
+  data.tenantId = (request.user as any).tenantId;
   const feedback = await prisma.feedback.create({ data });
   reply.status(201).send(feedback);
 }
 
 export async function updateFeedback(request: FastifyRequest, reply: FastifyReply) {
-  const { id } = request.params as { id: string };
-  const data = request.body as { comment?: string };
+  const id = (request.params as any).id;
+  const data = request.body as any;
+  const tenantId = (request.user as any).tenantId;
   try {
-    const feedback = await prisma.feedback.update({ where: { id }, data });
-    reply.send(feedback);
-  } catch {
-    reply.status(404).send({ message: 'Feedback not found' });
+    const updated = await prisma.feedback.updateMany({ where: { id, tenantId }, data });
+    if (updated.count === 0) {
+      return reply.status(404).send({ error: 'Feedback not found or update failed' });
+    }
+    const updatedFeedback = await prisma.feedback.findFirst({ where: { id, tenantId } });
+    reply.send(updatedFeedback);
+  } catch (error) {
+    reply.status(500).send({ error: 'Update failed' });
   }
 }
 
 export async function deleteFeedback(request: FastifyRequest, reply: FastifyReply) {
-  const { id } = request.params as { id: string };
+  const id = (request.params as any).id;
+  const tenantId = (request.user as any).tenantId;
   try {
-    await prisma.feedback.delete({ where: { id } });
+    const deleted = await prisma.feedback.deleteMany({ where: { id, tenantId } });
+    if (deleted.count === 0) {
+      return reply.status(404).send({ error: 'Feedback not found or delete failed' });
+    }
     reply.status(204).send();
-  } catch {
-    reply.status(404).send({ message: 'Feedback not found' });
+  } catch (error) {
+    reply.status(500).send({ error: 'Delete failed' });
   }
 }

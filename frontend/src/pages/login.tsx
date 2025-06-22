@@ -1,93 +1,60 @@
-
 import React, { useState } from 'react';
-import Logo from '../components/Logo';
+import { useAuth } from '../context/AuthProvider';
+import { FormField } from '../components/ui/FormField';
+import { Button } from '../components/ui/button';
 
-const LoginPage: React.FC = () => {
+import { useRouter } from 'next/router';
+
+export default function Login() {
+  const { login } = useAuth();
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     setLoading(true);
-    setError('');
     try {
-      const response = await fetch('/api/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-      if (!response.ok) {
-        const data = await response.json();
-        setError(data.error || 'Login failed');
-        setLoading(false);
-        return;
-      }
-      const data = await response.json();
-      // Save token to localStorage or context
-      localStorage.setItem('token', data.token);
-      // Redirect or update UI accordingly
-      window.location.href = '/dashboard';
-    } catch (err) {
-      setError('Network error');
+      await login(email, password);
+      router.push('/dashboard');
+    } catch (err: any) {
+      // Ensure error message is a string and set it
+      const message = typeof err === 'string' ? err : err.message || 'Login failed';
+      setError(message);
+    } finally {
       setLoading(false);
     }
   };
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-8 rounded shadow-md w-full max-w-md"
-      >
-        <div className="flex justify-center mb-6">
-          <Logo />
-        </div>
-        <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
-        {error && (
-          <div className="mb-4 text-red-600 font-semibold text-center">{error}</div>
-        )}
-        <div className="mb-4">
-          <label htmlFor="email" className="block mb-1 font-semibold">
-            Email
-          </label>
-          <input
-            id="email"
-            type="email"
-            className="w-full border border-gray-300 p-2 rounded"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            disabled={loading}
-          />
-        </div>
-        <div className="mb-6">
-          <label htmlFor="password" className="block mb-1 font-semibold">
-            Password
-          </label>
-          <input
-            id="password"
-            type="password"
-            className="w-full border border-gray-300 p-2 rounded"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            disabled={loading}
-          />
-        </div>
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
-          disabled={loading}
-        >
-          {loading ? 'Logging in...' : 'Log In'}
-        </button>
-      </form>
-    </div>
-  );
-};
 
-export default LoginPage;
+  return (
+    <main className="flex min-h-screen flex-col items-center justify-center p-24">
+      <h1 className="text-3xl font-bold mb-6">Login</h1>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-80">
+        <FormField
+          label="Email"
+          type="email"
+          placeholder="Enter your email"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          required
+        />
+        <FormField
+          label="Password"
+          type="password"
+          placeholder="Enter your password"
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+          required
+        />
+        {error && <p className="text-red-600">{error}</p>}
+        <Button type="submit" disabled={loading}>
+          {loading ? 'Logging in...' : 'Login'}
+        </Button>
+      </form>
+    </main>
+  );
+}

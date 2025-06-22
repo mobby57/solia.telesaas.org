@@ -1,0 +1,123 @@
+{
+  "info": {
+    "name": "Solia Script API",
+    "_postman_id": "12345678-abcd-efgh-ijkl-1234567890ab",
+    "description": "Postman collection for Script API CRUD operations",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "List Scripts",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/scripts",
+          "host": ["{{baseUrl}}"],
+          "path": ["scripts"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Script by ID",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/scripts/:id",
+          "host": ["{{baseUrl}}"],
+          "path": ["scripts", ":id"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create Script",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Sample Script\",\n  \"content\": \"This is a sample script content.\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/scripts",
+          "host": ["{{baseUrl}}"],
+          "path": ["scripts"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Update Script",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Updated Script Title\",\n  \"content\": \"Updated script content.\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/scripts/:id",
+          "host": ["{{baseUrl}}"],
+          "path": ["scripts", ":id"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete Script",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/scripts/:id",
+          "host": ["{{baseUrl}}"],
+          "path": ["scripts", ":id"]
+        }
+      },
+      "response": []
+    }
+  ]
+}

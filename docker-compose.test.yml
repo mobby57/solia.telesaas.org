@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  backend-test:
+    build:
+      context: ./solia-backend
+    container_name: solia-backend-test
+    ports:
+      - "4000:4000" # 4000 sur la machine hôte → 4000 dans le conteneur
+    environment:
+      - NODE_ENV=test
+      - PORT=4000
+      - MONGODB_URI=mongodb://root:example@mongodb-test:27017/solia-db-test?authSource=admin
+      - JWT_SECRET=testsecretkey
+    depends_on:
+      - mongodb-test
+
+  mongodb-test:
+    image: mongo:6.0
+    container_name: solia-mongodb-test
+    ports:
+      - "27018:27017" # Si tu veux tester la BDD séparément aussi
+    volumes:
+      - mongodb_test_data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+      MONGO_INITDB_DATABASE: solia-db-test
+
+volumes:
+  mongodb_test_data:
