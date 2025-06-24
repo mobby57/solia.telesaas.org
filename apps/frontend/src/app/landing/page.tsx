@@ -1,54 +1,56 @@
-import React from 'react';
-
 'use client';
 
-export default function LandingPage() {
+import { Button } from '../../components/ui/button';
+import { motion } from 'framer-motion';
+import Image from 'next/image';
+import styles from './LandingPage.module.css';
 
+export default function LandingPage() {
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-blue-50 to-white">
-      <section className="text-center max-w-4xl px-6 py-20">
-          <h1 className="text-5xl font-extrabold mb-6 text-blue-900">
-          Welcome to Solia
+    <main className="min-h-screen bg-gradient-to-br from-white to-[#f0f9f4] text-gray-900 flex flex-col items-center justify-between relative overflow-hidden">
+      {/* Fond décoratif avec cercles colorés */}
+      <div className={`${styles.backgroundCircles} absolute inset-0 -z-10 opacity-20 blur-3xl pointer-events-none`}>
+        <div className={styles.mentheCircle} />
+        <div className={styles.indigoCircle} />
+        <div className={styles.violetPastelCircle} />
+        <div className={styles.jauneDoreCircle} />
+      </div>
+
+      {/* Logo */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="mt-12"
+      >
+        <Image src="/logo-solia.png" alt="Solia logo" width={96} height={96} />
+      </motion.div>
+
+      {/* Hero section */}
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3, duration: 0.7 }}
+        className="text-center px-6 max-w-3xl"
+      >
+        <h1 className="text-5xl font-bold leading-tight mb-6 tracking-tight">
+          Simplifiez la gestion <span className="text-indigo-600">des missions</span>
+          <br /> pour les <span className="text-purple-500">organisations solidaires</span>
         </h1>
-        <p className="text-lg text-gray-700 mb-12">
-          Empower your missions with our all-in-one platform for managing prospects, donations, and more.
+        <p className="text-lg text-gray-600 mb-8">
+          Solia est une plateforme moderne et intuitive pour coordonner les bénévoles, gérer les tâches
+          et fluidifier les échanges au service de l’impact social.
         </p>
 
-        <a
-          href="/signup"
-          className="inline-block bg-blue-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-blue-700 transition"
-        >
-          Get Started
-        </a>
-      </section>
-      <section className="bg-white w-full py-16">
-        <div className="max-w-5xl mx-auto px-6">
-          <h2 className="text-3xl font-bold text-center mb-10">What Our Users Say</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <blockquote className="p-6 border rounded shadow bg-gray-50">
-              <p className="italic mb-4">{'"'}Solia transformed how we manage our missions. Highly recommended!{'"'}</p>
-              <footer className="text-sm font-semibold">- Alex P.</footer>
-            </blockquote>
-            <blockquote className="p-6 border rounded shadow bg-gray-50">
-              <p className="italic mb-4">{'"'}The multi-tenant support and billing integration saved us so much time.{'"'}</p>
-              <footer className="text-sm font-semibold">- Maria L.</footer>
-            </blockquote>
-            <blockquote className="p-6 border rounded shadow bg-gray-50">
-              <p className="italic mb-4">{'"'}Beautiful design and intuitive UI. Our team loves it.{'"'}</p>
-              <footer className="text-sm font-semibold">- John D.</footer>
-            </blockquote>
-          </div>
-        </div>
-      </section>
-      <section className="text-center max-w-4xl px-6 py-20">
-        <h2 className="text-3xl font-bold mb-6">Ready to get started?</h2>
-        <a
-          href="/signup"
-          className="inline-block bg-green-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-green-700 transition"
-        >
-          Sign Up Now
-        </a>
-      </section>
+        <Button size="lg" className="text-white bg-indigo-600 hover:bg-indigo-700 transition">
+          Commencer avec Solia
+        </Button>
+      </motion.div>
+
+      {/* Footer */}
+      <footer className="text-sm text-gray-400 py-6">
+        © {new Date().getFullYear()} Solia. Tous droits réservés.
+      </footer>
     </main>
   );
 }

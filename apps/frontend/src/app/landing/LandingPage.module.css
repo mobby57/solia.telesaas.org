@@ -1,0 +1,53 @@
+.backgroundCircles {
+  position: absolute;
+  inset: 0;
+  z-index: -10;
+  opacity: 0.2;
+  filter: blur(48px);
+  pointer-events: none;
+}
+
+.mentheCircle {
+  position: absolute;
+  top: 2.5rem; /* 10 */
+  left: 25%;
+  width: 16rem; /* 64 */
+  height: 16rem; /* 64 */
+  border-radius: 9999px;
+  background-color: #3EB489; /* Menthe */
+  mix-blend-mode: multiply;
+}
+
+.indigoCircle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 16rem;
+  height: 16rem;
+  border-radius: 9999px;
+  background-color: #4F46E5; /* Indigo */
+  mix-blend-mode: multiply;
+  transform: translate(-50%, -50%);
+}
+
+.violetPastelCircle {
+  position: absolute;
+  top: 33.3333%;
+  right: 25%;
+  width: 16rem;
+  height: 16rem;
+  border-radius: 9999px;
+  background-color: #C8A2C8; /* Violet pastel */
+  mix-blend-mode: multiply;
+}
+
+.jauneDoreCircle {
+  position: absolute;
+  bottom: 2.5rem; /* 10 */
+  left: 33.3333%;
+  width: 16rem;
+  height: 16rem;
+  border-radius: 9999px;
+  background-color: #FFC107; /* Jaune doré */
+  mix-blend-mode: multiply;
+}

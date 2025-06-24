@@ -1,41 +1,34 @@
 import React from 'react';
+import { cn } from '../../lib/utils';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'outline';
+  size?: 'sm' | 'md' | 'lg';
+  className?: string;
   children: React.ReactNode;
 }
 
-export const Button: React.FC<ButtonProps> = ({
-  variant = 'primary',
-  children,
-  className = '',
-  ...props
-}) => {
-  const baseClasses =
-    'px-4 py-2 rounded-lg font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 transition';
+export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ size = 'md', className, children, ...props }, ref) => {
+    const sizeClasses = {
+      sm: 'px-3 py-1.5 text-sm',
+      md: 'px-4 py-2 text-base',
+      lg: 'px-6 py-3 text-lg',
+    };
 
-  let variantClasses = '';
-  switch (variant) {
-    case 'primary':
-      variantClasses =
-        'bg-mint text-white hover:bg-mint-light focus:ring-mint-dark';
-      break;
-    case 'secondary':
-      variantClasses =
-        'bg-indigo text-white hover:bg-indigo-light focus:ring-indigo-dark';
-      break;
-    case 'outline':
-      variantClasses =
-        'border border-mint text-mint hover:bg-mint hover:text-white focus:ring-mint';
-      break;
+    return (
+      <button
+        ref={ref}
+        className={cn(
+          'inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none',
+          sizeClasses[size] || '',
+          className || ''
+        )}
+        {...props}
+      >
+        {children}
+      </button>
+    );
   }
+);
 
-  return (
-    <button
-      className={`${baseClasses} ${variantClasses} ${className}`}
-      {...props}
-    >
-      {children}
-    </button>
-  );
-};
+Button.displayName = 'Button';
