@@ -7,4 +7,5 @@ onlyBuiltDependencies:
   - '@prisma/client'
   - bcrypt
   - esbuild
+  - mongodb-memory-server
   - unrs-resolver

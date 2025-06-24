@@ -2,35 +2,42 @@
   "name": "solia",
   "private": true,
   "version": "1.0.0",
-  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "pnpm --filter backend dev",
-    "build": "pnpm --filter backend build && pnpm --filter frontend build",
-    "docker": "docker-compose up --build",
-    "test": "pnpm --filter backend test",
+    "dev": "concurrently -n frontend,backend -c blue,green \"pnpm --filter frontend dev\" \"pnpm --filter backend dev\"",
+    "dev:frontend": "pnpm --filter frontend dev",
+    "dev:backend": "pnpm --filter backend dev",
+    "build": "pnpm build:frontend && pnpm build:backend",
+    "build:frontend": "pnpm --filter frontend build",
+    "build:backend": "pnpm --filter backend build",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "clean": "rimraf node_modules **/dist **/build",
-    "solia:dev": "concurrently -k -n BACKEND,FRONTEND -c blue,green \"pnpm --filter @solia/backend dev\" \"pnpm --filter @solia/frontend dev\"",
-    "solia:build": "pnpm --filter @solia/backend build && pnpm --filter @solia/frontend build",
-    "solia:deploy": "echo \"Use CI/CD pipelines for deployment\""
+    "format": "prettier --write .",
+    "test": "vitest run",
+    "test:watch": "vitest watch",
+    "typecheck": "tsc -b",
+    "docker:dev": "docker-compose -f docker-compose.dev.yml up --build",
+    "docker:prod": "docker-compose -f docker-compose.yml up --build",
+    "db:seed": "pnpm --filter backend run seed"
   },
   "devDependencies": {
-    "@playwright/test": "^1.53.1",
-    "@types/bcrypt": "^5.0.2",
-    "@types/node": "^20.2.5",
+    "@types/react": "^19.1.8",
     "@typescript-eslint/eslint-plugin": "^8.34.1",
     "@typescript-eslint/parser": "^8.34.1",
-    "concurrently": "^8.0.0",
-    "dotenv": "^16.5.0",
-    "eslint": "^8.57.1",
-    "rimraf": "^5.0.0",
-    "ts-node-dev": "^2.0.0",
-    "typescript": "^5.8.3",
-    "vitest": "^3.2.4"
+    "concurrently": "^8.2.0",
+    "eslint": "^9.29.0",
+    "prettier": "^3.0.3",
+    "typescript": "^5.2.2",
+    "vitest": "^1.2.0"
   },
-  "dependencies": {
-    "@faker-js/faker": "^9.8.0",
-    "bcrypt": "^6.0.0"
+  "overrides": {
+    "@humanwhocodes/config-array": "0.13.0",
+    "@humanwhocodes/object-schema": "2.0.3",
+    "glob": "7.2.3",
+    "inflight": "1.0.6",
+    "rimraf": "3.0.2"
   }
 }

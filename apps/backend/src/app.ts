@@ -1,13 +1,16 @@
-import type { FastifyInstance } from 'fastify';
+import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import Fastify from 'fastify';
 import fastifyCors from '@fastify/cors';
 import fastifyJwt from '@fastify/jwt';
 import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUi from '@fastify/swagger-ui';
+import mercurius from 'mercurius';
+import fastifyCookie from '@fastify/cookie';
 import authPlugin from './middleware/auth';
-import prismaMultiTenantMiddleware from './middleware/prismaMultiTenant';
 import { registerRoutes } from './plugins/routes';
 import * as taskController from './controllers/tasks';
+import { schema } from './graphql/schema';
+import { resolvers } from './graphql/resolvers';
 
 export async function buildApp(): Promise<FastifyInstance> {
 
@@ -19,6 +22,9 @@ export async function buildApp(): Promise<FastifyInstance> {
     logger: true,
   });
 
+  // Register Cookie plugin
+  app.register(fastifyCookie);
+
   // Register CORS
   app.register(fastifyCors, {
     origin: process.env.FRONTEND_URL || '*',
@@ -29,6 +35,26 @@ export async function buildApp(): Promise<FastifyInstance> {
   app.register(fastifyJwt, {
     secret: process.env.JWT_SECRET,
     sign: { expiresIn: '1h' },
+  });
+
+  // Register Mercurius GraphQL plugin
+  app.register(mercurius, {
+    schema,
+    resolvers,
+    graphiql: true,
+    context: async (request: FastifyRequest, reply: FastifyReply) => {
+      // Extract JWT token and verify user for context
+      const token = request.cookies?.token || request.headers.authorization?.replace('Bearer ', '');
+      let user = null;
+      try {
+        if (token) {
+          user = await app.jwt.verify(token);
+        }
+      } catch (_err) {
+        // Token invalid or expired
+      }
+      return { user, request, reply };
+    },
   });
 
   // Register Swagger for API documentation
@@ -74,9 +100,9 @@ export async function buildApp(): Promise<FastifyInstance> {
   });
 
   // Global error handler
-  app.setErrorHandler((error, request, reply) => {
+  app.setErrorHandler((error: any, _request: any, _reply: any) => {
     app.log.error(error);
-    reply.status(500).send({ error: 'Internal Server Error' });
+    _reply.status(500).send({ error: 'Internal Server Error' });
   });
 
   return app;

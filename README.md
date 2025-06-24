@@ -1,66 +1,134 @@
-# Utilisation de pnpm dans le monorepo Solia
+# Solia CLI Monorepo
 
-Ce projet utilise désormais **pnpm** comme gestionnaire de paquets pour optimiser l'installation et la gestion des dépendances dans ce monorepo.
+This repository contains the Solia project structured as a pnpm monorepo with separate frontend and backend applications.
 
+## Project Structure
 
-### Installation de pnpm
+- `apps/frontend`: Next.js frontend application
+- `apps/backend`: Fastify backend application
+- Root contains shared configs and workspace setup
 
-Si ce n'est pas déjà fait, installez pnpm globalement :
+## Getting Started
 
-```bash
-npm install -g pnpm
-```
-
-### Nettoyage des anciens fichiers npm
-
-Depuis la racine du projet, supprimez les anciens dossiers `node_modules` et fichiers `package-lock.json` :
-
-```bash
-rm -rf node_modules
-rm -rf backend/node_modules frontend/node_modules
-rm -f package-lock.json
-rm -f backend/package-lock.json frontend/package-lock.json
-```
-
-### Installation des dépendances avec pnpm
-
-Installez toutes les dépendances du monorepo avec :
+### Install dependencies
 
 ```bash
 pnpm install
 ```
 
-### Commandes utiles
+### Development
 
-Pour lancer le backend uniquement :
-
-```bash
-pnpm --filter backend dev
-```
-
-Pour lancer le frontend uniquement :
+Run frontend and backend concurrently:
 
 ```bash
-pnpm --filter frontend dev
+pnpm dev
 ```
 
-Pour lancer les deux en parallèle :
+Or run individually:
 
 ```bash
-pnpm run dev:all
+pnpm dev:frontend
+pnpm dev:backend
 ```
 
-### Versions recommandées
+### Build
 
-- Node.js : voir `.nvmrc`
-- pnpm : version 8 ou supérieure
+Build both frontend and backend:
+
+```bash
+pnpm build
+```
+
+Or individually:
+
+```bash
+pnpm build:frontend
+pnpm build:backend
+```
+
+### Start
+
+Start the backend server (after build):
+
+```bash
+pnpm --filter backend start
+```
+
+Start the frontend server (after build):
+
+```bash
+pnpm --filter frontend start
+```
+
+### Linting and Formatting
+
+Run ESLint:
+
+```bash
+pnpm lint
+```
+
+Fix lint issues automatically:
+
+```bash
+pnpm lint:fix
+```
+
+Format code with Prettier:
+
+```bash
+pnpm format
+```
+
+### Testing
+
+Run tests:
+
+```bash
+pnpm test
+```
+
+Run tests in watch mode:
+
+```bash
+pnpm test:watch
+```
+
+### Type Checking
+
+Run TypeScript type checks:
+
+```bash
+pnpm typecheck
+```
+
+### Docker
+
+Run development environment with Docker Compose:
+
+```bash
+pnpm docker:dev
+```
+
+Run production environment with Docker Compose:
+
+```bash
+pnpm docker:prod
+```
+
+### Database Seeding
+
+Seed the database (backend):
+
+```bash
+pnpm db:seed
+```
+
+## Additional Notes
+
+- Ensure you have Docker installed if you plan to use Docker commands.
+- Environment variables should be configured as needed for frontend and backend.
+- For any issues, check logs and run lint and tests to diagnose.
 
 ---
-
-Cette migration permet d'avoir un monorepo plus rapide, plus léger et plus facile à maintenir.
-
-## Test Coverage
-
-[![Coverage Status](https://codecov.io/gh/yourusername/solia/branch/main/graph/badge.svg)](https://codecov.io/gh/yourusername/solia)
-
-Le projet maintient une couverture de test supérieure à 90% sur tous les modules backend. Les rapports de couverture sont générés avec Vitest et se trouvent dans le répertoire `backend/coverage`.
+This README provides a CLI-friendly overview of commands and setup for Solia in a pnpm monorepo.

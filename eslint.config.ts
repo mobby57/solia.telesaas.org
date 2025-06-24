@@ -8,6 +8,7 @@ export default defineConfig([
     files: ["**/*.js", "**/*.ts", "**/*.tsx"],
     ignores: ["**/dist/**", "**/build/**", "**/node_modules/**"],
     languageOptions: {
+      parser: "@typescript-eslint/parser",
       sourceType: "module",
       parserOptions: {
         ecmaVersion: "latest",
@@ -39,10 +40,12 @@ export default defineConfig([
   {
     files: ["apps/frontend/**/*.ts", "apps/frontend/**/*.tsx"],
     languageOptions: {
+      parser: "@typescript-eslint/parser",
       parserOptions: {
         project: "./apps/frontend/tsconfig.json",
       },
     },
+    extends: ["next", "next/core-web-vitals"],
     rules: {
       // Add Next.js or React specific rules here if needed
       "react/jsx-no-constructed-context-values": "warn",
@@ -63,6 +66,7 @@ export default defineConfig([
   {
     files: ["apps/backend/**/*.ts", "apps/backend/**/*.tsx"],
     languageOptions: {
+      parser: "@typescript-eslint/parser",
       parserOptions: {
         project: "./apps/backend/tsconfig.json",
       },

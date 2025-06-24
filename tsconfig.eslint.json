@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "apps/**/*",
+    "packages/**/*",
+    "src/**/*",
+    "backend/solia-test/**/*",
+    "frontend/src/**/*",
+    "tests/**/*"
+  ],
+  "exclude": ["node_modules", "dist"]
+}
