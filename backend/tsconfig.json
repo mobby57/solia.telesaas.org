@@ -15,7 +15,8 @@
     "types": ["node"]
   },
   "include": [
-    "src"
+    "src",
+    "start-server.ts"
   ],
   "exclude": [
     "node_modules",

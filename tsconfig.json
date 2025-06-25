@@ -27,6 +27,7 @@
     "src/**/*",
     "backend/solia-test/**/*",
     "frontend/src/**/*",
+    "backend/src/**/*",
     "tests/**/*",
     "vitest.config.ts"
   ],

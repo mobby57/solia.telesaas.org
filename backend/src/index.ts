@@ -2,12 +2,18 @@ import { buildApp } from './app';
 import { PrismaClient } from '@prisma/client';
 import prismaMultiTenantMiddleware from './middleware/prismaMultiTenant';
 
+import pino from 'pino';
+
 async function start() {
   const fastify = await buildApp();
   const prisma = new PrismaClient();
 
   // Add Prisma multi-tenant middleware to Prisma client
   prisma.$use(prismaMultiTenantMiddleware());
+
+  // Test pino logger
+  const logger = pino();
+  logger.info('Pino logger initialized successfully.');
 
   // Start server
   try {

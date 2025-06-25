@@ -1,0 +1,39 @@
+img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.interactive-solia-container {
+  position: relative;
+  width: 1440px;
+  height: 900px;
+}
+
+.interactive-solia-image {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.interactive-solia-zone {
+  position: absolute;
+  left: var(--left);
+  top: var(--top);
+  width: var(--width);
+  height: var(--height);
+  background-color: rgba(79, 70, 229, 0.3); /* Indigo pastel overlay */
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.interactive-solia-zone:hover {
+  background-color: rgba(79, 70, 229, 0.6);
+}

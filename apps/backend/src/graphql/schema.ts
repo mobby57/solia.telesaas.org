@@ -1,6 +1,4 @@
-import gql from 'graphql-tag';
-
-export const schema = gql`
+export const schema = `
   type Query {
     hello: String
   }
