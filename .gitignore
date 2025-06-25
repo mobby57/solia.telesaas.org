@@ -23,3 +23,5 @@ Thumbs.db
 .idea/
 solia.telesaas.org/
 solia.telesaas.org/
+node_modules/
+.next/
