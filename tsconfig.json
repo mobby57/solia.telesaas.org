@@ -21,6 +21,14 @@
       "@backend/*": ["apps/backend/*"]
     }
   },
-  "include": ["apps/**/*", "packages/**/*", "src/**/*", "backend/solia-test/**/*", "frontend/src/**/*", "tests/**/*"],
+  "include": [
+    "apps/**/*",
+    "packages/**/*",
+    "src/**/*",
+    "backend/solia-test/**/*",
+    "frontend/src/**/*",
+    "tests/**/*",
+    "vitest.config.ts"
+  ],
   "exclude": ["node_modules", "dist"]
 }

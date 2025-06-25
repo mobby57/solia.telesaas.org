@@ -1,8 +1,8 @@
-import { buildFastify } from './src/app';
+import { buildApp } from './src/app';
 
 async function start() {
   try {
-    const app = buildFastify();
+    const app = await buildApp();
     const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
     const address = '0.0.0.0';
 
@@ -15,4 +15,3 @@ async function start() {
 }
 
 start();
-
